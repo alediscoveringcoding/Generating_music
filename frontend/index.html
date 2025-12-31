@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 AI Music Generator - Generează Muzică cu AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">🎵 AI Music Generator</h1>
+            <p class="subtitle">Generează muzică originală cu ajutorul inteligenței artificiale</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Generator Section -->
+            <section class="generator-section">
+                <div class="card">
+                    <h2>Generează Muzică</h2>
+                    
+                    <!-- Genre Selection -->
+                    <div class="form-group">
+                        <label for="genre">Selectează Genul Muzical</label>
+                        <select id="genre" class="select-input">
+                            <option value="">-- Alege un gen --</option>
+                        </select>
+                        <small id="genre-description" class="description"></small>
+                    </div>
+
+                    <!-- Advanced Options -->
+                    <div class="advanced-options">
+                        <button class="toggle-btn" onclick="toggleAdvanced()">⚙️ Opțiuni Avansate</button>
+                        
+                        <div id="advanced-panel" class="advanced-panel hidden">
+                            <div class="form-group">
+                                <label for="temperature">
+                                    Creativitate (Temperature): <span id="temp-value">1.0</span>
+                                </label>
+                                <input 
+                                    type="range" 
+                                    id="temperature" 
+                                    min="0" 
+                                    max="2" 
+                                    step="0.1" 
+                                    value="1.0"
+                                    oninput="updateTempValue(this.value)"
+                                    class="slider"
+                                >
+                                <small>0.0 = Structurat | 2.0 = Chaotic</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="steps">
+                                    Lungimea Melodiei (Steps): <span id="steps-value">256</span>
+                                </label>
+                                <input 
+                                    type="range" 
+                                    id="steps" 
+                                    min="100" 
+                                    max="500" 
+                                    step="10" 
+                                    value="256"
+                                    oninput="updateStepsValue(this.value)"
+                                    class="slider"
+                                >
+                                <small>100 = Scurt | 500 = Lung</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="seed-note">
+                                    Nota Inițială MIDI (Seed): <span id="seed-value">60 (C4)</span>
+                                </label>
+                                <input 
+                                    type="range" 
+                                    id="seed-note" 
+                                    min="0" 
+                                    max="127" 
+                                    value="60"
+                                    oninput="updateSeedValue(this.value)"
+                                    class="slider"
+                                >
+                                <small>Notă MIDI pentru start (0-127)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="button-group">
+                        <button id="generate-btn" class="btn btn-primary" onclick="generateMusic()">
+                            <span class="btn-icon">🎹</span> Generează Muzică
+                        </button>
+                        <button id="stop-btn" class="btn btn-secondary hidden" onclick="stopGeneration()">
+                            ⏹️ Anulează
+                        </button>
+                    </div>
+
+                    <!-- Status Message -->
+                    <div id="status" class="status-message"></div>
+                </div>
+            </section>
+
+            <!-- Player Section -->
+            <section class="player-section">
+                <div class="card">
+                    <h2>🔊 Redare Audio</h2>
+                    <div class="player-container">
+                        <audio id="player" controls class="audio-player"></audio>
+                        <div class="player-info">
+                            <p id="now-playing">Nicio muzică în redare...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="downloadCurrentMusic()" id="download-btn" disabled>
+                            📥 Descarcă MIDI
+                        </button>
+                        <button class="btn btn-secondary" onclick="deleteCurrentMusic()" id="delete-btn" disabled>
+                            🗑️ Șterge
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="history-section">
+                <div class="card">
+                    <h2>📜 Istoricul Generărilor</h2>
+                    <div class="history-controls">
+                        <button class="btn btn-secondary" onclick="loadHistory()">
+                            🔄 Reîncarcă Istoric
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearHistoryUI()">
+                            🗑️ Golește Lista
+                        </button>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <p class="empty-message">Nu există înregistrări în istoric. Generează o melodie!</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>🎵 AI Music Generator v1.0 | Powered by Magenta + FastAPI</p>
+            <p>Creat cu ❤️ pentru inovație și creativitate</p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

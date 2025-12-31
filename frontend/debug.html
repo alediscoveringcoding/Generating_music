@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - AI Music Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', monospace;
+            background: #0f172a;
+            color: #f1f5f9;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { margin-bottom: 20px; color: #818cf8; }
+        .test-section { margin-bottom: 30px; padding: 20px; background: #1e293b; border-radius: 8px; border: 1px solid #475569; }
+        .test-section h2 { margin-bottom: 15px; color: #60a5fa; font-size: 1.2rem; }
+        button { 
+            padding: 10px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        button:hover { background: #4f46e5; }
+        .output { 
+            background: #0f172a;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #10b981;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error { border-left-color: #ef4444; color: #fca5a5; }
+        .loading { border-left-color: #f59e0b; color: #fcd34d; }
+        pre { font-size: 0.9em; margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+        .status { margin-bottom: 20px; padding: 15px; border-radius: 5px; }
+        .status.online { background: #064e3b; color: #10b981; border: 1px solid #10b981; }
+        .status.offline { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+        code { background: #334155; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug - AI Music Generator</h1>
+        
+        <div id="status" class="status offline">
+            <strong>Status Server:</strong> <span id="status-text">Verificare...</span>
+        </div>
+
+        <div class="test-section">
+            <h2>1️⃣ Test Root Endpoint</h2>
+            <button onclick="testRoot()">Test GET /</button>
+            <div id="root-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2️⃣ Test Genres</h2>
+            <button onclick="testGenres()">Test GET /genres</button>
+            <div id="genres-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3️⃣ Test Health</h2>
+            <button onclick="testHealth()">Test GET /health</button>
+            <div id="health-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4️⃣ Test Generate Music</h2>
+            <button onclick="testGenerate()">Test POST /generate (Electronic)</button>
+            <div id="generate-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>5️⃣ Test History</h2>
+            <button onclick="testHistory()">Test GET /history</button>
+            <div id="history-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Console Log</h2>
+            <div id="console-log" class="output" style="max-height: 200px;">
+                <em>Logs će se afișa aici...</em>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let consoleLines = [];
+
+        // Override console.log
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            addConsoleLine(message);
+        };
+
+        function addConsoleLine(text) {
+            consoleLines.unshift(text);
+            if (consoleLines.length > 50) consoleLines.pop();
+            const consoleLog = document.getElementById("console-log");
+            if (consoleLog) {
+                consoleLog.innerHTML = '<pre>' + consoleLines.join('\n---\n') + '</pre>';
+            }
+        }
+
+        function showResult(elementId, data, isError = false) {
+            const elem = document.getElementById(elementId);
+            if (!elem) return;
+            
+            const json = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            elem.innerHTML = `<pre>${escapeHtml(json)}</pre>`;
+            elem.className = 'output' + (isError ? ' error' : ' loading');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function makeRequest(endpoint, method = "GET", body = null) {
+            const elementId = getElementId(endpoint);
+            const elem = document.getElementById(elementId);
+            if (elem) elem.className = 'output loading';
+
+            const fullUrl = `${API_URL}${endpoint}`;
+            console.log(`📡 Requesting: ${method} ${fullUrl}`);
+
+            try {
+                const options = {
+                    method: method,
+                    headers: { "Content-Type": "application/json" }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                    console.log(`Body:`, body);
+                }
+                
+                const response = await fetch(fullUrl, options);
+                const responseData = await response.json();
+
+                console.log(`Response (${response.status}):`, responseData);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                showResult(elementId, responseData, false);
+                updateServerStatus(true);
+                return responseData;
+
+            } catch (error) {
+                console.error(`❌ Error:`, error.message);
+                showResult(elementId, `ERROR: ${error.message}`, true);
+                updateServerStatus(false);
+            }
+        }
+
+        function getElementId(endpoint) {
+            if (endpoint === '/') return 'root-output';
+            if (endpoint === '/genres') return 'genres-output';
+            if (endpoint === '/health') return 'health-output';
+            if (endpoint === '/history') return 'history-output';
+            return 'generate-output';
+        }
+
+        async function testRoot() { await makeRequest('/'); }
+        async function testGenres() { await makeRequest('/genres'); }
+        async function testHealth() { await makeRequest('/health'); }
+        async function testHistory() { await makeRequest('/history'); }
+        async function testGenerate() { 
+            await makeRequest('/generate', 'POST', {
+                genre: 'electronic',
+                temperature: 1.0,
+                steps: 256,
+                seed_note: 60
+            }); 
+        }
+
+        function updateServerStatus(online) {
+            const status = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
+            if (online) {
+                status.className = 'status online';
+                statusText.textContent = '✅ Server online';
+            } else {
+                status.className = 'status offline';
+                statusText.textContent = '❌ Server offline or unreachable';
+            }
+        }
+
+        // Check server on load
+        window.addEventListener('load', async () => {
+            console.log('🚀 Page loaded, testing server...');
+            await makeRequest('/');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #1e1e1e; color: #d4d4d4; }
+        .test { margin: 20px 0; padding: 15px; background: #2d2d2d; border-radius: 5px; }
+        button { padding: 10px 20px; background: #0e639c; color: white; border: none; cursor: pointer; border-radius: 3px; }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        pre { background: #1e1e1e; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Test</h1>
+    
+    <div class="test">
+        <h2>Test 1: Genres</h2>
+        <button onclick="testGenres()">Test /genres</button>
+        <div id="genres-result"></div>
+    </div>
+
+    <div class="test">
+        <h2>Test 2: Health</h2>
+        <button onclick="testHealth()">Test /health</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test">
+        <h2>Test 3: Root</h2>
+        <button onclick="testRoot()">Test /</button>
+        <div id="root-result"></div>
+    </div>
+
+    <div class="test">
+        <h2>Test 4: Generate Music</h2>
+        <button onclick="testGenerate()">Test /generate (Electronic)</button>
+        <div id="generate-result"></div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        async function makeRequest(endpoint, method = "GET", body = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                };
+                
+                if (body) options.body = JSON.stringify(body);
+                
+                console.log(`Requesting: ${API_URL}${endpoint}`);
+                const response = await fetch(`${API_URL}${endpoint}`, options);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return { success: true, data };
+                
+            } catch (error) {
+                console.error(error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function testGenres() {
+            const result = await makeRequest("/genres");
+            displayResult("genres-result", result);
+        }
+
+        async function testHealth() {
+            const result = await makeRequest("/health");
+            displayResult("health-result", result);
+        }
+
+        async function testRoot() {
+            const result = await makeRequest("/");
+            displayResult("root-result", result);
+        }
+
+        async function testGenerate() {
+            const result = await makeRequest("/generate", "POST", {
+                genre: "electronic",
+                temperature: 1.0,
+                steps: 256,
+                seed_note: 60
+            });
+            displayResult("generate-result", result);
+        }
+
+        function displayResult(elementId, result) {
+            const elem = document.getElementById(elementId);
+            if (result.success) {
+                elem.innerHTML = `<p class="success">✅ Success</p><pre>${JSON.stringify(result.data, null, 2)}</pre>`;
+            } else {
+                elem.innerHTML = `<p class="error">❌ Error: ${result.error}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+[
+  {
+    "timestamp": "2025-12-31T02:12:18.494992",
+    "genre": "pop",
+    "filename": "pop_20251231_021218.wav",
+    "temperature": 1.0,
+    "steps": 260
+  },
+  {
+    "timestamp": "2025-12-31T02:12:31.308040",
+    "genre": "rap",
+    "filename": "rap_20251231_021231.wav",
+    "temperature": 1.0,
+    "steps": 260
+  },
+  {
+    "timestamp": "2025-12-31T02:17:30.513631",
+    "genre": "electronic",
+    "filename": "electronic_20251231_021730.wav",
+    "temperature": 1.0,
+    "steps": 260,
+    "duration": 60,
+    "bpm": 128
+  },
+  {
+    "timestamp": "2025-12-31T02:17:43.566931",
+    "genre": "classical",
+    "filename": "classical_20251231_021743.wav",
+    "temperature": 1.0,
+    "steps": 260,
+    "duration": 60,
+    "bpm": 72
+  }
+]

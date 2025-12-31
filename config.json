@@ -1,0 +1,75 @@
+{
+  "app_name": "AI Music Generator",
+  "version": "1.0.0",
+  "environment": "production",
+  "backend": {
+    "host": "127.0.0.1",
+    "port": 8000,
+    "reload": true,
+    "log_level": "info"
+  },
+  "frontend": {
+    "host": "localhost",
+    "port": 5500,
+    "live_reload": true
+  },
+  "music_generation": {
+    "default_output_dir": "backend/generated_music",
+    "max_file_size_mb": 10,
+    "cleanup_old_files_days": 30
+  },
+  "magenta": {
+    "model_path": "backend/models/basic_rnn.mag",
+    "model_url": "https://storage.googleapis.com/magenta-models/melody_rnn/basic_rnn.mag"
+  },
+  "genres": {
+    "classical": {
+      "temperature": 0.8,
+      "steps": 320,
+      "tempo": 80,
+      "description": "Armonii lente, melodii orchestrale"
+    },
+    "pop": {
+      "temperature": 1.0,
+      "steps": 256,
+      "tempo": 120,
+      "description": "Melodii catchy, structură simplă"
+    },
+    "jazz": {
+      "temperature": 1.2,
+      "steps": 300,
+      "tempo": 110,
+      "description": "Ritm variabil, improvizație"
+    },
+    "rock": {
+      "temperature": 1.1,
+      "steps": 280,
+      "tempo": 140,
+      "description": "Tempo ridicat, progresii puternice"
+    },
+    "rap": {
+      "temperature": 0.9,
+      "steps": 240,
+      "tempo": 100,
+      "description": "Tempo constant, accent ritmic"
+    },
+    "electronic": {
+      "temperature": 1.3,
+      "steps": 350,
+      "tempo": 130,
+      "description": "Synth-uri, tempo mare"
+    },
+    "ambient": {
+      "temperature": 0.7,
+      "steps": 400,
+      "tempo": 60,
+      "description": "Atmosferă liniștitoare, progresii lente"
+    },
+    "folk": {
+      "temperature": 0.95,
+      "steps": 300,
+      "tempo": 100,
+      "description": "Melodii tradiționale, simple"
+    }
+  }
+}
