@@ -48,5 +48,14 @@
     "steps": 260,
     "duration": 60,
     "bpm": 110
+  },
+  {
+    "timestamp": "2025-12-31T12:44:25.405424",
+    "genre": "folk",
+    "filename": "folk_20251231_124425.wav",
+    "temperature": 1.0,
+    "steps": 260,
+    "duration": 60,
+    "bpm": 100
   }
 ]
