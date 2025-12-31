@@ -75,9 +75,30 @@ CURRENT_DIR = Path(__file__).parent
 GENERATED_MUSIC_DIR = Path(OUTPUT_DIR)
 
 
-@app.get("/", tags=["Info"])
+@app.get("/", tags=["Frontend"])
 async def root():
-    """Rută principală - informații API"""
+    """Servește interfața frontend pe pagina principală"""
+    index_path = FRONTEND_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path, media_type="text/html")
+    # Fallback la info API dacă nu există frontend
+    return {
+        "name": "AI Music Generator",
+        "version": "1.0.0",
+        "description": "Generează muzică cu ajutorul inteligenței artificiale",
+        "endpoints": {
+            "genres": "/genres",
+            "generate": "/generate (POST)",
+            "download": "/download/{filename}",
+            "history": "/history",
+            "delete": "/delete/{filename}"
+        }
+    }
+
+
+@app.get("/api/info", tags=["Info"])
+async def api_info():
+    """Informații despre API"""
     return {
         "name": "AI Music Generator",
         "version": "1.0.0",
